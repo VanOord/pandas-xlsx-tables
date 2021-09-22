@@ -15,6 +15,6 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .to_xlsx_table import df_to_xlsx_table
+from .to_xlsx_table import df_to_xlsx_table, dfs_to_xlsx_tables
 
-__all__ = ["df_to_xlsx_table"]
+__all__ = ["df_to_xlsx_table", "dfs_to_xlsx_tables"]
