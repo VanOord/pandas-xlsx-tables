@@ -14,3 +14,7 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
 finally:
     del version, PackageNotFoundError
+
+from .to_xlsx_table import df_to_xlsx_table
+
+__all__ = ["df_to_xlsx_table"]
