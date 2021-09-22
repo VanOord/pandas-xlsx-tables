@@ -53,12 +53,15 @@ def df_to_table(
     tab.tableStyleInfo = table_style
 
     with warnings.catch_warnings():
+        # suppress a warning about table column names needed to be set
+        # as we have correctly taken care of that
         warnings.simplefilter("ignore", category=UserWarning)
+
         ws.add_table(tab)
     return ws
 
 
-def dfs_to_xlsx_tables(
+def frames_to_xlsx_tables(
     input: Iterable[Tuple[DataFrame, str]],
     file: Union[str, BinaryIO],
     index: bool = True,
@@ -89,7 +92,7 @@ def dfs_to_xlsx_tables(
     return
 
 
-def df_to_xlsx_table(
+def frame_to_xlsx_table(
     df: DataFrame,
     table_name: str,
     file: Optional[Union[str, BinaryIO]],
@@ -97,7 +100,7 @@ def df_to_xlsx_table(
     table_style: Optional[TableStyleInfo] = None,
 ) -> None:
 
-    dfs_to_xlsx_tables(
+    frames_to_xlsx_tables(
         [(df, table_name)],
         file=file or table_name + ".xlsx",
         index=index,
