@@ -15,7 +15,12 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .from_xlsx_tables import xlsx_tables_to_frames
+from .from_xlsx_tables import xlsx_table_to_frame, xlsx_tables_to_frames
 from .to_xlsx_table import frame_to_xlsx_table, frames_to_xlsx_tables
 
-__all__ = ["frame_to_xlsx_table", "frames_to_xlsx_tables", "xlsx_tables_to_frames"]
+__all__ = [
+    "frame_to_xlsx_table",
+    "frames_to_xlsx_tables",
+    "xlsx_table_to_frame",
+    "xlsx_tables_to_frames",
+]

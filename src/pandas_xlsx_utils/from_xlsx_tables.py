@@ -8,6 +8,10 @@ from pandas import DataFrame
 from pandas.core.dtypes.common import is_list_like
 
 
+class TableNotFound(Exception):
+    pass
+
+
 def table_to_frame(ws: ReadOnlyWorksheet, table: Table, index) -> pd.DataFrame:
     columns = [col.name for col in table.tableColumns]
     data_rows = ws[table.ref][
@@ -51,3 +55,31 @@ def xlsx_tables_to_frames(
         for ws in wb.worksheets
         for name, tbl in {**ws.tables}.items()
     }
+
+
+def xlsx_table_to_frame(
+    file, table: str, index: Union[Literal["auto"], int, Iterable[int]] = "auto"
+):
+    """Get all tables from a given workbook. Returns a dictionary of tables.
+    Requires a filename, which includes the file path and filename.
+
+    Inspired by:
+    https://github.com/pandas-dev/pandas/issues/24862#issuecomment-458885960
+    https://stackoverflow.com/questions/43941365/openpyxl-read-tables-from-existing-data-book-example
+    """
+
+    # Load the workbook, from the filename, setting read_only to False
+    wb = load_workbook(
+        filename=file, read_only=False, keep_vba=False, data_only=True, keep_links=False
+    )
+
+    # Initialize the dictionary of tables
+
+    for ws in wb.worksheets:
+        if table in ws.tables:
+            return table_to_frame(ws, ws.tables[table], index)
+    all_tables = {f"'{table}'" for ws in wb.worksheets for table in ws.tables.keys()}
+    raise TableNotFound(
+        f"Table '{table}' could not be found in the workbook. "
+        f"Choose from {', '.join(all_tables)}."
+    )
