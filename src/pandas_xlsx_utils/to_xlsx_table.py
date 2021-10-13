@@ -1,108 +1,110 @@
-import warnings
-from typing import BinaryIO, Iterable, Optional, Tuple, Union
+from typing import BinaryIO, Iterable, Literal, Optional, Tuple, Union
 
-from openpyxl import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
-from openpyxl.worksheet._write_only import WriteOnlyWorksheet
-from openpyxl.worksheet.table import Table, TableColumn, TableStyleInfo
+import numpy as np
+import xlsxwriter
+from openpyxl.worksheet.table import TableStyleInfo
 from pandas import DataFrame
 
-from .utils import tuple_to_coordinate
+from .utils import NamedTableStyle, create_format_mapping, format_for_col
+
+HeaderOrientation = Literal["diagonal", "horizontal", "vertical"]
 
 
-def df_to_table(
-    df: DataFrame,
-    table_name: str,
-    ws: WriteOnlyWorksheet,
-    index: bool = True,
-    table_style: Optional[TableStyleInfo] = None,
-) -> Table:
-
-    # note that this returns index and colum names on separate rows
-    rows = dataframe_to_rows(df, index=index, header=True)
-
-    header = next(rows)
-    if index:
-        # Don't include the empty row returned here
-        index_header = next(rows)
-        header = [*index_header, *header[len(index_header) :]]
-
-    ws.append([str(h) for h in header])
-    for row in rows:
-        ws.append(row)
-
-    bottom_right = (
-        len(df.columns) + 1 if index else 0,
-        len(df) + 1,
-    )
-    tab = Table(
-        displayName=table_name,
-        ref=f"A1:{tuple_to_coordinate(bottom_right)}",
-        tableColumns=[TableColumn(i + 1, name=str(h)) for i, h in enumerate(header)],
-    )
-
-    # Use the default excel table style with striped rows and banded columns
-    if not table_style:
-        table_style = TableStyleInfo(
-            name="TableStyleMedium9",
-            showFirstColumn=index,
-            showLastColumn=False,
-            showRowStripes=True,
-            showColumnStripes=False,
-        )
-    tab.tableStyleInfo = table_style
-
-    with warnings.catch_warnings():
-        # suppress a warning about table column names needed to be set
-        # as we have correctly taken care of that
-        warnings.simplefilter("ignore", category=UserWarning)
-
-        ws.add_table(tab)
-    return ws
-
-
-def frames_to_xlsx_tables(
+def dfs_to_xlsx_tables(
     input: Iterable[Tuple[DataFrame, str]],
     file: Union[str, BinaryIO],
     index: bool = True,
-    table_style: Optional[TableStyleInfo] = None,
+    table_style: Optional[NamedTableStyle] = "Table Style Medium 9",
+    nan_inf_to_errors=False,
+    header_orientation: HeaderOrientation = "horizontal",
 ) -> None:
+    """Convert multiple dataframes to an excel file.
 
-    if not table_style:
-        table_style = TableStyleInfo(
-            name="TableStyleMedium9",
-            showFirstColumn=index,
-            showLastColumn=False,
-            showRowStripes=True,
-            showColumnStripes=False,
-        )
+    Args:
+        input (Iterable[Tuple[DataFrame, str]]): A list of tuples of (df, table_name)
+        file (Union[str, BinaryIO]): File name or descriptor for the output
+        index (bool, optional): Include the datafrme index in the results. Defaults
+            to True
+        table_style (Optional[NamedTableStyle], optional): Excel table style. Defaults
+            to "Table Style Medium 9".
+        nan_inf_to_errors (bool, optional): Explicitly write nan/inf values as errors.
+            Defaults to False.
+        header_orientation (HeaderOrientation, optional): Rotate the table headers, can
+            be horizontal, vertical or diagonal. Defaults to "horizontal".
+    """
+    wb = xlsxwriter.Workbook(file, options=dict(nan_inf_to_errors=nan_inf_to_errors))
 
-    wb = Workbook(write_only=True)
+    format_mapping = create_format_mapping(wb)
+    if header_orientation == "diagonal":
+        header_format = wb.add_format()
+        header_format.set_rotation(45)
+    elif header_orientation == "vertical":
+        header_format = wb.add_format()
+        header_format.set_rotation(90)
+
     for df, table_name in input:
-        ws = wb.create_sheet(title=table_name)
-        df_to_table(
-            df,
-            table_name,
-            ws,
-            index=index,
-            table_style=table_style,
-        )
-
-    wb.save(file)
+        ws = wb.add_worksheet(name=table_name)
+        if index:
+            df = df.reset_index()
+        if not nan_inf_to_errors:
+            df = (
+                df.replace(np.Inf, np.finfo(np.float64).max)
+                .replace(-np.Inf, np.finfo(np.float64).min)
+                .fillna("")
+            )
+        options = {
+            "data": df.values,
+            "name": table_name,
+            "style": table_style,
+            "first_column": index,
+            "columns": [
+                {"header": c, "format": format_for_col(df[c], format_mapping)}
+                for c in df.columns
+            ],
+        }
+        ws.add_table(0, 0, len(df), len(df.columns) - 1, options)
+        if header_orientation == "diagonal":
+            ws.set_row(0, max(15, 4 * max(len(c) for c in df.columns)), header_format)
+        elif header_orientation == "vertical":
+            ws.set_row(0, max(15, 6 * max(len(c) for c in df.columns)), header_format)
+        elif header_orientation == "horizontal":
+            # adjust row widths
+            for i, width in enumerate([len(x) for x in df.columns]):
+                ws.set_column(i, i, max(8.43, width))
+    wb.close()
     return
 
 
-def frame_to_xlsx_table(
+def df_to_xlsx_table(
     df: DataFrame,
     table_name: str,
-    file: Optional[Union[str, BinaryIO]],
+    file: Optional[Union[str, BinaryIO]] = None,
     index: bool = True,
-    table_style: Optional[TableStyleInfo] = None,
+    table_style: Optional[TableStyleInfo] = "Table Style Medium 9",
+    nan_inf_to_errors=False,
+    header_orientation: HeaderOrientation = "horizontal",
 ) -> None:
+    """Convert single dataframe to an excel file.
 
-    frames_to_xlsx_tables(
+    Args:
+        df (DataFrame): Padas dataframe to convert to excel.
+        table_name (str):Name of the table.
+        file (Union[str, BinaryIO]): File name or descriptor for the output.
+            Defaults to <table_name>.xlsx
+        index (bool, optional): Include the datafrme index in the results. Defaults
+            to True
+        table_style (Optional[NamedTableStyle], optional): Excel table style. Defaults
+            to "Table Style Medium 9".
+        nan_inf_to_errors (bool, optional): Explicitly write nan/inf values as errors.
+            Defaults to False.
+        header_orientation (HeaderOrientation, optional): Rotate the table headers, can
+            be horizontal, vertical or diagonal. Defaults to "horizontal".
+    """
+    dfs_to_xlsx_tables(
         [(df, table_name)],
         file=file or table_name + ".xlsx",
         index=index,
         table_style=table_style,
+        nan_inf_to_errors=nan_inf_to_errors,
+        header_orientation=header_orientation,
     )
