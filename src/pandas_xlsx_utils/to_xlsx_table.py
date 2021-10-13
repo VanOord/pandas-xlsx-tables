@@ -64,14 +64,19 @@ def dfs_to_xlsx_tables(
         }
         ws.add_table(0, 0, len(df), len(df.columns) - 1, options)
         if header_orientation == "diagonal":
-            ws.set_row(0, max(15, 4 * max(len(c) for c in df.columns)), header_format)
+            ws.set_row(
+                0, max(15, 12 + 4 * max(len(c) for c in df.columns)), header_format
+            )
         elif header_orientation == "vertical":
-            ws.set_row(0, max(15, 6 * max(len(c) for c in df.columns)), header_format)
+            ws.set_row(
+                0, max(15, 4 + 6 * max(len(c) for c in df.columns)), header_format
+            )
         elif header_orientation == "horizontal":
             # adjust row widths
             for i, width in enumerate([len(x) for x in df.columns]):
                 ws.set_column(i, i, max(8.43, width))
     wb.close()
+    df_to_xlsx_table(df, "my_table", header_orientation="diagonal", index=False)
     return
 
 
