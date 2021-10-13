@@ -76,7 +76,6 @@ def dfs_to_xlsx_tables(
             for i, width in enumerate([len(x) for x in df.columns]):
                 ws.set_column(i, i, max(8.43, width))
     wb.close()
-    df_to_xlsx_table(df, "my_table", header_orientation="diagonal", index=False)
     return
 
 

@@ -1,4 +1,4 @@
-# pandas-xlsx-utils
+# pandas-xlsx-tables
 
 Add a short description here!
 

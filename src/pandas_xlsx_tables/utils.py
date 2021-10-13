@@ -1,7 +1,6 @@
-from typing import Dict, Literal, Tuple
+from typing import Dict, Literal
 
 import pandas as pd
-from openpyxl.utils.cell import get_column_letter
 from pandas.api.types import (
     is_datetime64_any_dtype,
     is_float_dtype,
@@ -72,17 +71,6 @@ NamedTableStyle = Literal[
     "Table Style Medium 27",
     "Table Style Medium 28",
 ]
-
-
-def tuple_to_coordinate(tup: Tuple[int, int]):
-    """Tuple of row,col to excel coordiante
-
-    Inverse of openpyxl.utils.cell.coordinate_to_tuple
-    tuple_to_coordinate(1,3) = "A3"
-
-    """
-    row, col = tup
-    return f"{get_column_letter(col)}{row}"
 
 
 def create_format_mapping(workbook):

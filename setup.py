@@ -1,5 +1,5 @@
 """
-    Setup file for pandas-xlsx-utils.
+    Setup file for pandas-xlsx-tables.
     Use setup.cfg to configure your project.
 
     This file was generated with PyScaffold 4.0.2.

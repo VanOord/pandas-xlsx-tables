@@ -1,7 +1,7 @@
 # .coveragerc to control coverage.py
 [run]
 branch = True
-source = pandas_xlsx_utils
+source = pandas_xlsx_tables
 # omit = bad_file.py
 
 [paths]

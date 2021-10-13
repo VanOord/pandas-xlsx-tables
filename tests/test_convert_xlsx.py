@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pandas_xlsx_utils import df_to_xlsx_table, dfs_to_xlsx_tables, xlsx_tables_to_dfs
+from pandas_xlsx_tables import df_to_xlsx_table, dfs_to_xlsx_tables, xlsx_tables_to_dfs
 
 
 @pytest.fixture

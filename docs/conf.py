@@ -37,7 +37,7 @@ except ImportError:
     from sphinx import apidoc
 
 output_dir = os.path.join(__location__, "api")
-module_dir = os.path.join(__location__, "../src/pandas_xlsx_utils")
+module_dir = os.path.join(__location__, "../src/pandas_xlsx_tables")
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
@@ -114,7 +114,7 @@ source_suffix = [".rst", ".md"]
 master_doc = "index"
 
 # General information about the project.
-project = "pandas-xlsx-utils"
+project = "pandas-xlsx-tables"
 copyright = "2021, Thijs Damsma"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -181,7 +181,7 @@ html_theme_options = {"sidebar_width": "300px", "page_width": "1200px"}
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 try:
-    from pandas_xlsx_utils import __version__ as version
+    from pandas_xlsx_tables import __version__ as version
 except ImportError:
     pass
 else:
@@ -246,7 +246,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "pandas-xlsx-utils-doc"
+htmlhelp_basename = "pandas-xlsx-tables-doc"
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -266,7 +266,7 @@ latex_documents = [
     (
         "index",
         "user_guide.tex",
-        "pandas-xlsx-utils Documentation",
+        "pandas-xlsx-tables Documentation",
         "Thijs Damsma",
         "manual",
     )
