@@ -1,10 +1,10 @@
 # pandas-xlsx-tables
 
-Even though you might not like it, Excel isn't going anywhere. And Excel with tables is a lot beter than without: Reference columns by name, warnings when datatypes betwee rows change, no more freeze panes, custom filters or issues when you sort one column but not the other.
+Even though you might not like it, Excel isn't going anywhere. And Excel with tables is [a lot better than without](https://duckduckgo.com/?q=advantages+of+excel+tables).
 
-Out of the box Pandas does not support reading and writing excel tables, and as the API of pandas is already pretty complex. So instead of adding a feature inside Pandas this separte package provides the required utility functions to read and write between Excel Tables and Pandas DataFrames.
+Strangely Pandas does not support reading from and writing to excel tables out of the box, and due to the complexity of Pandas this is [not easily added](https://github.com/pandas-dev/pandas/issues/24862) (though having this built into Pandas would be the prefered solution). This separate package is thus a separate companion to Pandas, with utility functions to read and write Excel Tables from and to Pandas DataFrames.
 
-!["Excel screenshot](docs/_static/xlsx_table.png)
+!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table.png)
 
 ```python
 >>> from pandas_xlsx_tables import xlsx_table_to_df
@@ -22,4 +22,4 @@ And the reverse process:
 >>> df_to_xlsx_table(df, "my_table", header_orientation="diagonal", index=False)
 ```
 
-!["Excel screenshot](docs/_static/xlsx_table_2.png)
+!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table_2.png)
