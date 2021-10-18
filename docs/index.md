@@ -1,6 +1,6 @@
 # pandas-xlsx-tables
 
-Add a short description here!
+ This separate package provides utility functions to read and write Excel Tables from/to Pandas DataFrames.
 
 
 ## Note

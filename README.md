@@ -2,9 +2,9 @@
 
 Even though you might not like it, Excel isn't going anywhere. And Excel with tables is [a lot better than without](https://duckduckgo.com/?q=advantages+of+excel+tables).
 
-Strangely Pandas does not support reading from and writing to excel tables out of the box, and due to the complexity of Pandas this is [not easily added](https://github.com/pandas-dev/pandas/issues/24862) (though having this built into Pandas would be the prefered solution). This separate package provides is thus a separate companion to Pandas with utility functions to read and write Excel Tables from/to Pandas DataFrames.
+Strangely Pandas does not support reading from and writing to excel tables out of the box, and due to the complexity of Pandas this is [not easily added](https://github.com/pandas-dev/pandas/issues/24862) (though having this built into Pandas would be the prefered solution). This separate package is thus a separate companion to Pandas, with utility functions to read and write Excel Tables from and to Pandas DataFrames.
 
-!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table_1.png)
+!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table.png)
 
 ```python
 >>> from pandas_xlsx_tables import xlsx_table_to_df
