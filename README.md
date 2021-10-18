@@ -4,7 +4,7 @@ Even though you might not like it, Excel isn't going anywhere. And Excel with ta
 
 Out of the box Pandas does not support reading and writing excel tables, and as the API of pandas is already pretty complex. So instead of adding a feature inside Pandas this separte package provides the required utility functions to read and write between Excel Tables and Pandas DataFrames.
 
-!["Excel screenshot](docs/_static/xlsx_table.png)
+!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table_1.png)
 
 ```python
 >>> from pandas_xlsx_tables import xlsx_table_to_df
@@ -22,4 +22,4 @@ And the reverse process:
 >>> df_to_xlsx_table(df, "my_table", header_orientation="diagonal", index=False)
 ```
 
-!["Excel screenshot](docs/_static/xlsx_table_2.png)
+!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table_2.png)
