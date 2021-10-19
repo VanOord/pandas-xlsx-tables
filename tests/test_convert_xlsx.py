@@ -120,3 +120,13 @@ class TestRoundtrip:
             # Xlwxwriter does not discern +/- infinity with this option
             r[-np.Inf] = r[np.Inf]
         assert df.replace(r).equals(result.replace(r))
+
+    def test_write_dates_with_timezone(self):
+        df = pd.DataFrame(
+            pd.date_range("2021-10-19T21:30:00Z", "2021-10-19T23:30:00Z", freq="30min")
+        )
+        with pytest.raises(
+            TypeError, match="Excel doesn't support timezones in datetimes"
+        ):
+            df_to_xlsx_table(df, "test_write_dates_with_timezone")
+        df_to_xlsx_table(df, "test_write_dates_with_timezone", remove_timezone=True)
