@@ -123,10 +123,25 @@ class TestRoundtrip:
 
     def test_write_dates_with_timezone(self):
         df = pd.DataFrame(
-            pd.date_range("2021-10-19T21:30:00Z", "2021-10-19T23:30:00Z", freq="30min")
+            pd.date_range("2021-10-19T21:30:00Z", "2021-10-19T23:30:00Z", freq="30min"),
+            columns=["dates"],
         )
         with pytest.raises(
             TypeError, match="Excel doesn't support timezones in datetimes"
         ):
             df_to_xlsx_table(df, "test_write_dates_with_timezone")
         df_to_xlsx_table(df, "test_write_dates_with_timezone", remove_timezone=True)
+
+        result = xlsx_tables_to_dfs("test_write_dates_with_timezone.xlsx")[
+            "test_write_dates_with_timezone"
+        ]
+        result["dates"] = result["dates"].dt.tz_localize("UTC")
+        assert df.equals(result)
+
+    def test_write_numeric_header(self):
+        df = pd.DataFrame([[pd.Timestamp(2022, 1, 22, 14, 15, 0), 1, 1.0, "b"]])
+        df_to_xlsx_table(df, "test_write_numeric_header")
+        result = xlsx_tables_to_dfs("test_write_numeric_header.xlsx")[
+            "test_write_numeric_header"
+        ]
+        assert (df.values == result.values).all()
