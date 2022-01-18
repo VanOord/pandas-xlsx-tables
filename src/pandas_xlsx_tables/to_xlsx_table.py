@@ -59,28 +59,31 @@ def dfs_to_xlsx_tables(
                 .replace(-np.Inf, np.finfo(np.float64).min)
                 .fillna("")
             )
+
+        column_names = (str(c) for c in df.columns)
         options = {
             "data": df.values,
             "name": table_name,
             "style": table_style,
             "first_column": index,
             "columns": [
-                {"header": c, "format": format_for_col(df[c], format_mapping)}
-                for c in df.columns
+                {"header": col_name, "format": format_for_col(df[col], format_mapping)}
+                for col, col_name in zip(df.columns, column_names)
             ],
         }
         ws.add_table(0, 0, len(df), len(df.columns) - 1, options)
+
         if header_orientation == "diagonal":
             ws.set_row(
-                0, max(15, 12 + 4 * max(len(c) for c in df.columns)), header_format
+                0, max(15, 12 + 4 * max(len(c) for c in column_names)), header_format
             )
         elif header_orientation == "vertical":
             ws.set_row(
-                0, max(15, 4 + 6 * max(len(c) for c in df.columns)), header_format
+                0, max(15, 4 + 6 * max(len(c) for c in column_names)), header_format
             )
         elif header_orientation == "horizontal":
             # adjust row widths
-            for i, width in enumerate([len(str(x)) for x in df.columns]):
+            for i, width in enumerate(len(str(x)) for x in column_names):
                 ws.set_column(i, i, max(8.43, width))
     wb.close()
     return
