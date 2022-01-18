@@ -1,8 +1,8 @@
 # pandas-xlsx-tables
 
-Even though you might not like it, Excel isn't going anywhere. And Excel with tables is [a lot better than without](https://www.ecosia.org/search?q=advantages+of+excel+tables).
+Even though you might not like it, Excel isn't going anywhere. And Excel with tables is [a lot better than without](https://www.ecosia.org/search?q=advantages+of+excel+tables). Some highlights: better performance, references column by name (vs setting named ranges), sticky header (vs freeze panes), stricter typing (one datatype per column), filter dropdowns and many more.
 
-Strangely Pandas does not support reading from and writing to excel tables out of the box, and due to the complexity of Pandas this is [not easily added](https://github.com/pandas-dev/pandas/issues/24862) (though having this built into Pandas would be the prefered solution). This separate package is thus a separate companion to Pandas, with utility functions to read and write Excel Tables from and to Pandas DataFrames.
+Out of the box Pandas provides to and from excel functionality, but it cannot write native excel tables (the result is only formatted like one). This is where pandas-xlsx-tables comes in: convert excel tables to dataframes and vice versa, whilest mostly preserving data types. The api has been kept deliberatly  simple as to provide useful functionality out of the box.
 
 !["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table.png)
 
@@ -23,3 +23,8 @@ And the reverse process:
 ```
 
 !["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table_2.png)
+
+
+## Why not integretate this in Pandas directly?
+
+Due to the complexity of Pandas and the large number of users it is very difficult to significantly change the current excel implementeation. Also the abstractions available to plug different engines are not that helpful. Basically I tried and [gave up](https://github.com/pandas-dev/pandas/issues/24862) (but of course I would prefer having this built into Pandas). 
