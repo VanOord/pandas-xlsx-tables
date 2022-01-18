@@ -1,7 +1,10 @@
 # Changelog
 
-## Version 0.1 (development)
+## Version 0.0.1 (development)
 
-- Feature A added
-- FIX: nasty bug #1729 fixed
-- add your changes here!
+- Initial release
+
+## Version 0.0.4 (development)
+
+- Add support for handling timezones
+- Expand documentation

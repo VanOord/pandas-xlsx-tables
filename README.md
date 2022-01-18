@@ -1,10 +1,10 @@
 # pandas-xlsx-tables
 
-Even though you might not like it, Excel isn't going anywhere. And Excel with tables is a lot beter than without: Reference columns by name, warnings when datatypes betwee rows change, no more freeze panes, custom filters or issues when you sort one column but not the other.
+Even though you might not like it, Excel isn't going anywhere. And Excel with tables is [a lot better than without](https://www.ecosia.org/search?q=advantages+of+excel+tables). Some highlights are: better performance, reference columns by name (vs defining named ranges), sticky headers (vs freeze panes), stricter typing (vs random types) and sort/filter dropdowns.
 
-Out of the box Pandas does not support reading and writing excel tables, and as the API of pandas is already pretty complex. So instead of adding a feature inside Pandas this separte package provides the required utility functions to read and write between Excel Tables and Pandas DataFrames.
+Out of the box Pandas provides to and from excel functionality, but it cannot write native excel tables (the result is only formatted like one). This is where pandas-xlsx-tables comes in: convert excel tables to dataframes and vice versa, whilest mostly preserving data types. The api has been kept deliberatly  simple as to provide useful functionality out of the box.
 
-!["Excel screenshot](docs/_static/xlsx_table.png)
+!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table.png)
 
 ```python
 >>> from pandas_xlsx_tables import xlsx_table_to_df
@@ -22,4 +22,9 @@ And the reverse process:
 >>> df_to_xlsx_table(df, "my_table", header_orientation="diagonal", index=False)
 ```
 
-!["Excel screenshot](docs/_static/xlsx_table_2.png)
+!["Excel screenshot](https://raw.githubusercontent.com/VanOord/pandas-xlsx-tables/master/docs/_static/xlsx_table_2.png)
+
+
+## Why not integretate this in Pandas directly?
+
+Due to the complexity of Pandas and the large number of users it is very difficult to significantly change the current excel implementeation. Also the abstractions available to plug different engines are not that helpful. Basically I tried and [gave up](https://github.com/pandas-dev/pandas/issues/24862) (but of course I would prefer having this built into Pandas). 

@@ -17,6 +17,7 @@ def dfs_to_xlsx_tables(
     table_style: Optional[NamedTableStyle] = "Table Style Medium 9",
     nan_inf_to_errors=False,
     header_orientation: HeaderOrientation = "horizontal",
+    remove_timezone: bool = False,
 ) -> None:
     """Convert multiple dataframes to an excel file.
 
@@ -32,7 +33,13 @@ def dfs_to_xlsx_tables(
         header_orientation (HeaderOrientation, optional): Rotate the table headers, can
             be horizontal, vertical or diagonal. Defaults to "horizontal".
     """
-    wb = xlsxwriter.Workbook(file, options=dict(nan_inf_to_errors=nan_inf_to_errors))
+    wb = xlsxwriter.Workbook(
+        file,
+        options=dict(
+            nan_inf_to_errors=nan_inf_to_errors,
+            remove_timezone=remove_timezone,
+        ),
+    )
 
     format_mapping = create_format_mapping(wb)
     if header_orientation == "diagonal":
@@ -73,7 +80,7 @@ def dfs_to_xlsx_tables(
             )
         elif header_orientation == "horizontal":
             # adjust row widths
-            for i, width in enumerate([len(x) for x in df.columns]):
+            for i, width in enumerate([len(str(x)) for x in df.columns]):
                 ws.set_column(i, i, max(8.43, width))
     wb.close()
     return
@@ -87,6 +94,7 @@ def df_to_xlsx_table(
     table_style: Optional[TableStyleInfo] = "Table Style Medium 9",
     nan_inf_to_errors=False,
     header_orientation: HeaderOrientation = "horizontal",
+    remove_timezone: bool = False,
 ) -> None:
     """Convert single dataframe to an excel file.
 
@@ -111,4 +119,5 @@ def df_to_xlsx_table(
         table_style=table_style,
         nan_inf_to_errors=nan_inf_to_errors,
         header_orientation=header_orientation,
+        remove_timezone=remove_timezone,
     )
