@@ -1,6 +1,6 @@
 # pandas-xlsx-tables
 
-Even though you might not like it, Excel isn't going anywhere. And Excel with tables is [a lot better than without](https://www.ecosia.org/search?q=advantages+of+excel+tables). Some highlights: better performance, references column by name (vs setting named ranges), sticky header (vs freeze panes), stricter typing (one datatype per column), filter dropdowns and many more.
+Even though you might not like it, Excel isn't going anywhere. And Excel with tables is [a lot better than without](https://www.ecosia.org/search?q=advantages+of+excel+tables). Some highlights are: better performance, reference columns by name (vs defining named ranges), sticky headers (vs freeze panes), stricter typing (vs random types) and sort/filter dropdowns.
 
 Out of the box Pandas provides to and from excel functionality, but it cannot write native excel tables (the result is only formatted like one). This is where pandas-xlsx-tables comes in: convert excel tables to dataframes and vice versa, whilest mostly preserving data types. The api has been kept deliberatly  simple as to provide useful functionality out of the box.
 
