@@ -4,13 +4,20 @@ import numpy as np
 import xlsxwriter
 from openpyxl.worksheet.table import TableStyleInfo
 from pandas import DataFrame
+import pandas as pd
 import linecache
 import sys
-
 from .utils import NamedTableStyle, create_format_mapping, format_for_col
+from typing import Iterable, Tuple, Optional, Union, BinaryIO
+from typing import Optional, Union
+from pandas.core.frame import DataFrame
+
+
+
+
 
 HeaderOrientation = Literal["diagonal", "horizontal", "vertical"]
-import pandas as pd
+
 
 def check_datetime64(df):
     for col in df.columns:
@@ -140,7 +147,7 @@ def df_to_xlsx_table(
     remove_timezone: bool = False,
 ) -> None:
     """Convert single dataframe to an excel file.
-
+    Deprecated: use df_to_xlsx_tables instead that works with single or multiple tables.
     Args:
         df (DataFrame): Padas dataframe to convert to excel.
         table_name (str):Name of the table.
@@ -172,3 +179,75 @@ def df_to_xlsx_table(
         print ("If Permission denied - maybe file is open and needs to be closed first?")
         PrintException()
      
+
+
+def df_to_xlsx_tables(tuple_or_list, file: Optional[Union[str, BinaryIO]] = None,
+                   index: bool = True, table_style: Optional[Union[str, NamedTableStyle]] = "Table Style Medium 9",
+                   nan_inf_to_errors: bool = False,
+                   header_orientation: str = "horizontal",
+                   remove_timezone: bool = False) -> None:
+    """
+    Export DataFrame(s) to XLSX file.
+
+    Parameters:
+    -----------
+    tuple_or_list : tuple or list of tuples
+        Tuple or list  containing either:
+        - An iterable of (DataFrame, str) tuples to export multiple tables to a single workbook.
+        - A single tuple (DataFrame, str) DataFrame and a table_name to export a single table to a workbook.
+
+    file : Optional[Union[str, BinaryIO]], default None
+        The file name or BinaryIO object to save the workbook.
+
+    index : bool, default True
+        Whether to include the DataFrame index in the exported table(s).
+
+    table_style : Optional[Union[str, TableStyle]], default "Table Style Medium 9"
+        The table style to apply to the exported table(s).
+
+    nan_inf_to_errors : bool, default False
+        Whether to convert NaN and infinite values to errors in the exported table(s).
+
+    header_orientation : str, default "horizontal"
+        The orientation of the table header in the exported table(s).
+
+    remove_timezone : bool, default False
+        Whether to remove the timezone from the datetime columns in the exported table(s).
+
+    Returns:
+    --------
+    None
+    """
+    print ('Saving xlsx table to ',file)
+     
+    if isinstance(tuple_or_list, Tuple) :
+        # Export single table
+        df, table_name = tuple_or_list
+        df=df_time_to_strings(df) #xlsxwriter does not support datetime64[ns] format so convert to strings if needed
+        
+        data_list=[(df,table_name)]
+    elif isinstance(tuple_or_list, Iterable):
+        data_list2=[] #list of tuples with processed dataframes and table names
+        data_list=tuple_or_list
+        for df,table_name in data_list:
+            df=df_time_to_strings(df)
+            data_list2.append((df,table_name))
+    else:
+        print (tuple_or_list)
+        raise ValueError("Invalid first argument passed to function.")
+    try : 
+        dfs_to_xlsx_tables(
+            data_list2,
+            file=file or table_name + ".xlsx",
+            index=index,
+            table_style=table_style,
+            nan_inf_to_errors=nan_inf_to_errors,
+            header_orientation=header_orientation,
+            remove_timezone=remove_timezone,
+            )
+       
+    except Exception as e:
+        print(e)
+        print ("Error in df_to_xlsx_table")
+        print ("If Permission denied - maybe file is open and needs to be closed first?")
+        PrintException()
