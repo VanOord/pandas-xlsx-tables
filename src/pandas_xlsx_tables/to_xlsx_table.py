@@ -4,10 +4,41 @@ import numpy as np
 import xlsxwriter
 from openpyxl.worksheet.table import TableStyleInfo
 from pandas import DataFrame
+import linecache
+import sys
 
 from .utils import NamedTableStyle, create_format_mapping, format_for_col
 
 HeaderOrientation = Literal["diagonal", "horizontal", "vertical"]
+import pandas as pd
+
+def check_datetime64(df):
+    for col in df.columns:
+        if pd.api.types.is_datetime64_ns_dtype(df[col].dtype):
+            return True
+    return False
+
+def df_time_to_strings(df):
+    """
+    Check and convert datetime64[ns] columns to string format in a Pandas DataFrame.
+
+    Args:
+        df (Pandas DataFrame): The DataFrame to check and convert.
+
+    Returns:
+        Pandas DataFrame: The DataFrame with datetime columns converted to string format.
+    """
+    if check_datetime64(df): # check if there are datetime columns
+        # create a copy of the input DataFrame
+        df_copy = df.copy()
+        # check for datetime columns and convert to string format using strftime()
+        for col in df_copy.columns:
+            if df_copy[col].dtype == 'datetime64[ns]':
+                df_copy[col] = df_copy[col].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        return df_copy
+    else:
+        return df
 
 
 def dfs_to_xlsx_tables(
@@ -89,6 +120,15 @@ def dfs_to_xlsx_tables(
     return
 
 
+def PrintException():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    print ( 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+
 def df_to_xlsx_table(
     df: DataFrame,
     table_name: str,
@@ -115,7 +155,9 @@ def df_to_xlsx_table(
         header_orientation (HeaderOrientation, optional): Rotate the table headers, can
             be horizontal, vertical or diagonal. Defaults to "horizontal".
     """
-    dfs_to_xlsx_tables(
+    df=df_time_to_strings(df) #xlsxwriter does not support datetime64[ns] format so convert to strings if needed
+    try : 
+        dfs_to_xlsx_tables(
         [(df, table_name)],
         file=file or table_name + ".xlsx",
         index=index,
@@ -124,3 +166,9 @@ def df_to_xlsx_table(
         header_orientation=header_orientation,
         remove_timezone=remove_timezone,
     )
+    except Exception as e:
+        print(e)
+        print ("Error in df_to_xlsx_table")
+        print ("If Permission denied - maybe file is open and needs to be closed first?")
+        PrintException()
+     
