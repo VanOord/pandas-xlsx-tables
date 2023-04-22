@@ -2,7 +2,9 @@ from typing import BinaryIO, Iterable, Literal, Optional, Tuple, Union
 
 import numpy as np
 import xlsxwriter
-from openpyxl.worksheet.table import TableStyleInfo
+import openpyxl
+from openpyxl import load_workbook
+from openpyxl.worksheet.table import Table, TableStyleInfo
 from pandas import DataFrame
 import pandas as pd
 import linecache
@@ -11,6 +13,7 @@ from .utils import NamedTableStyle, create_format_mapping, format_for_col
 from typing import Iterable, Tuple, Optional, Union, BinaryIO
 from typing import Optional, Union
 from pandas.core.frame import DataFrame
+import tempfile
 
 
 
@@ -48,6 +51,48 @@ def df_time_to_strings(df):
         return df
 
 
+def copy_table(source_file, source_sheet, dest_file, dest_sheet):
+    """
+    Copy an Excel table from one workbook to another while preserving other sheets in the destination workbook.
+
+    Args:
+        source_file (str): The path to the source workbook.
+        source_sheet (str): The name of the sheet containing the table in the source workbook.
+        dest_file (str): The path to the destination workbook.
+        dest_sheet (str): The name of the sheet where you want to copy the table to in the destination workbook.
+
+    Returns:
+        None
+    """
+    # Load the source workbook
+    wb_source = load_workbook(source_file)
+
+    
+
+    # Load the destination workbook
+    wb_dest = load_workbook(dest_file)
+    
+    # Get the sheet containing the table in the source workbook
+    ws_source = wb_source[source_sheet]
+
+    # Get the sheet where you want to copy the table to in the destination workbook
+    try : ws_dest = wb_dest[dest_sheet]
+    except: ws_dest = wb_dest.create_sheet(dest_sheet)
+
+    # Copy the table from the source sheet to the destination sheet
+    for row in ws_source.iter_rows(min_row=1, values_only=True):
+        ws_dest.append(row)
+
+    # Create a table in the destination sheet
+    table = Table(displayName="Table1", ref=ws_dest.dimensions)
+    style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
+                           showLastColumn=False, showRowStripes=True, showColumnStripes=False)
+    table.tableStyleInfo = style
+    ws_dest.add_table(table)
+
+    # Save the destination workbook
+    wb_dest.save(dest_file)
+
 def dfs_to_xlsx_tables(
     input: Iterable[Tuple[DataFrame, str]],
     file: Union[str, BinaryIO],
@@ -56,6 +101,7 @@ def dfs_to_xlsx_tables(
     nan_inf_to_errors=False,
     header_orientation: HeaderOrientation = "horizontal",
     remove_timezone: bool = False,
+    append: bool = False,
 ) -> None:
     """Convert multiple dataframes to an excel file.
 
@@ -71,8 +117,21 @@ def dfs_to_xlsx_tables(
         header_orientation (HeaderOrientation, optional): Rotate the table headers, can
             be horizontal, vertical or diagonal. Defaults to "horizontal".
     """
+    
+
+    if append: #xlsxwriter does not support appending to existing files so we need to use openpyxl and tenp files as workaround
+        #create a temp file with .xlsx extension
+
+        
+        temp_file = tempfile.NamedTemporaryFile(suffix='.xlsx',delete=False) #create a temp file
+        print ('tempfile',temp_file.name)
+        temp_file_path = temp_file.name
+        temp_file.close()
+    else:
+        temp_file_path = file
+    print ('tempfilepath',temp_file_path)
     wb = xlsxwriter.Workbook(
-        file,
+        temp_file_path,
         options=dict(
             nan_inf_to_errors=nan_inf_to_errors,
             remove_timezone=remove_timezone,
@@ -123,8 +182,15 @@ def dfs_to_xlsx_tables(
             # adjust row widths
             for i, width in enumerate(len(str(x)) for x in column_names):
                 ws.set_column(i, i, max(8.43, width))
+     
     wb.close()
+    if append:
+        for df, table_name in input:
+            copy_table(source_file=temp_file_path, source_sheet=table_name, dest_file=file, dest_sheet=table_name)
+        #copy_sheets_from_temp_to_original(temp_file_path, file)
+        os.remove(temp_file_path)
     return
+
 
 
 def PrintException():
@@ -185,7 +251,9 @@ def df_to_xlsx_tables(tuple_or_list, file: Optional[Union[str, BinaryIO]] = None
                    index: bool = True, table_style: Optional[Union[str, NamedTableStyle]] = "Table Style Medium 9",
                    nan_inf_to_errors: bool = False,
                    header_orientation: str = "horizontal",
-                   remove_timezone: bool = False) -> None:
+                   remove_timezone: bool = False,
+                   append=False) -> None:
+                    
     """
     Export DataFrame(s) to XLSX file.
 
@@ -213,6 +281,7 @@ def df_to_xlsx_tables(tuple_or_list, file: Optional[Union[str, BinaryIO]] = None
 
     remove_timezone : bool, default False
         Whether to remove the timezone from the datetime columns in the exported table(s).
+    append : bool, default False
 
     Returns:
     --------
@@ -243,11 +312,11 @@ def df_to_xlsx_tables(tuple_or_list, file: Optional[Union[str, BinaryIO]] = None
             table_style=table_style,
             nan_inf_to_errors=nan_inf_to_errors,
             header_orientation=header_orientation,
-            remove_timezone=remove_timezone,
+            remove_timezone=remove_timezone,append=append
             )
        
     except Exception as e:
         print(e)
-        print ("Error in df_to_xlsx_table")
+        print ("Error in df_to_xlsx_tables")
         print ("If Permission denied - maybe file is open and needs to be closed first?")
         PrintException()
