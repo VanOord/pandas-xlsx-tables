@@ -8,7 +8,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from pandas import DataFrame
 import pandas as pd
 import linecache
-import sys
+import sys,os
 from .utils import NamedTableStyle, create_format_mapping, format_for_col
 from typing import Iterable, Tuple, Optional, Union, BinaryIO
 from typing import Optional, Union
