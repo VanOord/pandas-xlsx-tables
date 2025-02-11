@@ -60,7 +60,7 @@ def dfs_to_xlsx_tables(
                 .fillna("")
             )
 
-        column_names = (str(c) for c in df.columns)
+        column_names = [str(c) for c in df.columns]
         options = {
             "data": df.values,
             "name": table_name,
