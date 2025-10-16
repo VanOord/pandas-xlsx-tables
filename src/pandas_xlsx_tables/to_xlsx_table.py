@@ -9,6 +9,8 @@ from .utils import NamedTableStyle, create_format_mapping, format_for_col
 
 HeaderOrientation = Literal["diagonal", "horizontal", "vertical"]
 
+Inf = np.inf
+
 
 def dfs_to_xlsx_tables(
     input: Iterable[Tuple[DataFrame, str]],
@@ -24,14 +26,15 @@ def dfs_to_xlsx_tables(
     Args:
         input (Iterable[Tuple[DataFrame, str]]): A list of tuples of (df, table_name)
         file (Union[str, BinaryIO]): File name or descriptor for the output
-        index (bool, optional): Include the datafrme index in the results. Defaults
-            to True
-        table_style (Optional[NamedTableStyle], optional): Excel table style. Defaults
-            to "Table Style Medium 9".
-        nan_inf_to_errors (bool, optional): Explicitly write nan/inf values as errors.
-            Defaults to False.
-        header_orientation (HeaderOrientation, optional): Rotate the table headers, can
-            be horizontal, vertical or diagonal. Defaults to "horizontal".
+        index (bool, optional): Include the datafrme index in the results.
+             Defaults to True
+        table_style (Optional[NamedTableStyle], optional): Excel table style.
+            Defaults to "Table Style Medium 9".
+        nan_inf_to_errors (bool, optional): Explicitly write NaN/Inf values as errors.
+            Defaults to False: Inf -> highest possible double precision float.
+        header_orientation (HeaderOrientation, optional): Rotate the table headers,
+            can be horizontal, vertical or diagonal.
+            Defaults to "horizontal".
     """
     wb = xlsxwriter.Workbook(
         file,
@@ -55,8 +58,8 @@ def dfs_to_xlsx_tables(
             df = df.reset_index()
         if not nan_inf_to_errors:
             df = (
-                df.replace(np.Inf, np.finfo(np.float64).max)
-                .replace(-np.Inf, np.finfo(np.float64).min)
+                df.replace(Inf, np.finfo(np.float64).max)
+                .replace(-Inf, np.finfo(np.float64).min)
                 .fillna("")
             )
 
@@ -110,7 +113,7 @@ def df_to_xlsx_table(
             to True
         table_style (Optional[NamedTableStyle], optional): Excel table style. Defaults
             to "Table Style Medium 9".
-        nan_inf_to_errors (bool, optional): Explicitly write nan/inf values as errors.
+        nan_inf_to_errors (bool, optional): Explicitly write NaN/Inf values as errors.
             Defaults to False.
         header_orientation (HeaderOrientation, optional): Rotate the table headers, can
             be horizontal, vertical or diagonal. Defaults to "horizontal".

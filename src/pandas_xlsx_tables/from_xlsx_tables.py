@@ -2,12 +2,15 @@ from itertools import chain, cycle
 from typing import Iterable, Literal, Union
 
 import pandas as pd
-from numpy import Inf, NaN
+import numpy as np
 from openpyxl import load_workbook
 from openpyxl.worksheet._read_only import ReadOnlyWorksheet
 from openpyxl.worksheet.table import Table
 from pandas import DataFrame
 from pandas.core.dtypes.common import is_list_like
+
+Inf = np.inf
+NaN = np.nan
 
 
 class TableNotFound(Exception):
@@ -24,9 +27,9 @@ def table_to_df(
 ) -> pd.DataFrame:
     columns = [col.name for col in table.tableColumns]
     data_rows = ws[table.ref][
-        (table.headerRowCount or 0) : -table.totalsRowCount
-        if table.totalsRowCount is not None
-        else None
+        (table.headerRowCount or 0) : (
+            -table.totalsRowCount if table.totalsRowCount is not None else None
+        )
     ]
     data = ((cell.value for cell in row) for row in data_rows)
     replacements = chain(
