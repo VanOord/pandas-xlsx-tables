@@ -84,7 +84,7 @@ class TestRoundtrip:
 
         if nan_inf_to_errors:
             # Xlwxwriter does not discern +/- infinity with this option
-            r[-np.Inf] = r[np.Inf]
+            r[-Inf] = r[Inf]
         assert df.replace(r).equals(result.replace(r))
 
     @pytest.mark.parametrize("nan_inf_to_errors", (True, False))
@@ -121,7 +121,7 @@ class TestRoundtrip:
 
         if nan_inf_to_errors:
             # Xlwxwriter does not discern +/- infinity with this option
-            r[-np.Inf] = r[np.Inf]
+            r[-Inf] = r[Inf]
         assert df.replace(r).equals(result.replace(r))
 
     def test_write_dates_with_timezone(self):
