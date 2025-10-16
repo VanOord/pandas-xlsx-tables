@@ -8,6 +8,9 @@ import pytest
 
 from pandas_xlsx_tables import df_to_xlsx_table, dfs_to_xlsx_tables, xlsx_tables_to_dfs
 
+Inf = np.inf
+NaN = np.nan
+
 
 @pytest.fixture
 def cleandir():
@@ -28,7 +31,7 @@ def df():
             ["Pears", 2000, "p", 12e-12, t1, datetime(2021, 2, 2)],
             ["Bananas", 6000, "", 6500, t2, datetime(2021, 1, 3)],
             ["Oranges", 500, "o", "inf", t2, datetime(2021, 4, 2)],
-            ["Plums", 500, "o", -np.Inf, t2, datetime(2021, 4, 2)],
+            ["Plums", 500, "o", -Inf, t2, datetime(2021, 4, 2)],
         ],
         columns=["name", "int", "A very long header", "scientific", "datetime", "date"],
     ).set_index("name")
@@ -74,9 +77,9 @@ class TestRoundtrip:
 
         # nan and inf do not compare as equal, so use this work around:
         r = {
-            np.Inf: "_inf_",
-            -np.Inf: "_-inf_",
-            np.NaN: "_nan_",
+            Inf: "_inf_",
+            -Inf: "_-inf_",
+            NaN: "_nan_",
         }
 
         if nan_inf_to_errors:
@@ -111,9 +114,9 @@ class TestRoundtrip:
 
         # nan and inf do not compare as equal, so use this work around:
         r = {
-            np.Inf: "_inf_",
-            -np.Inf: "_-inf_",
-            np.NaN: "_nan_",
+            Inf: "_inf_",
+            -Inf: "_-inf_",
+            NaN: "_nan_",
         }
 
         if nan_inf_to_errors:
