@@ -10,11 +10,12 @@ finally:
     del version, PackageNotFoundError
 
 from .from_xlsx_tables import xlsx_table_to_df, xlsx_tables_to_dfs
-from .to_xlsx_table import df_to_xlsx_table, dfs_to_xlsx_tables
+from .to_xlsx_table import df_to_xlsx_table, dfs_to_xlsx_tables,df_to_xlsx_tables
 
 __all__ = [
     "df_to_xlsx_table",
     "dfs_to_xlsx_tables",
+    "df_to_xlsx_tables",
     "xlsx_table_to_df",
     "xlsx_tables_to_dfs",
 ]
